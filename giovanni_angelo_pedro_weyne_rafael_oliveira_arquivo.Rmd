@@ -1,0 +1,95 @@
+---
+title: "Projeto Final - Estatística Descritiva"
+author: "Giovanni Angelo, Pedro Weyne, Rafael Oliveira"
+date: "20/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE
+)
+
+#coloca o diretório do script como working directory
+knitr::opts_knit$set(root.dir = dirname(rstudioapi::getActiveDocumentContext()$path))
+
+#carrega os pacotes necessários
+vetor_pacotes = c(
+  "readr",
+  "ggplot2",
+  "plotly",
+  "e1071",
+  "dplyr",
+  "Hmisc",
+  "DescTools",
+  "kableExtra",
+  "gridExtra"
+)
+lapply(vetor_pacotes, require, character.only = TRUE)
+```
+
+## Introdução
+
+Neste projeto vamos fazer uma análise dos dados do ENADE de 2017 referentes ao curso **Música(Licenciatura)**. Segue abaixo uma prévia dos dados importados, filtrados e tratados.
+
+```{r intro}
+enade2017 = read_csv2("MICRODADOS_ENADE_2017.txt")
+
+microdados_enade_filtrados = enade2017 %>% dplyr::select(
+  CO_GRUPO,
+  CO_REGIAO_CURSO,
+  NU_IDADE,
+  TP_SEXO,
+  CO_TURNO_GRADUACAO,
+  NT_GER,
+  QE_I01,
+  QE_I02,
+  QE_I08,
+  QE_I21,
+  QE_I23,
+  NT_OBJ_FG,
+  NT_OBJ_CE
+)
+
+microdados_musica = microdados_enade_filtrados %>% filter(CO_GRUPO == 4301)
+
+
+microdados_musica = microdados_musica %>% mutate(
+  estado_civil = case_when(
+    QE_I01 == "A" ~ "Solteiro(a)",
+    QE_I01 == "B" ~ "Casado(a)",
+    QE_I01 == "C" ~ "Separado(a)",
+    QE_I01 == "D" ~ "Viúvo(a)",
+    TRUE ~ "Outro"
+  )
+)
+
+microdados_musica = microdados_musica %>% mutate(
+  regiao = case_when(
+    CO_REGIAO_CURSO == 1 ~ "Norte",
+    CO_REGIAO_CURSO == 2 ~ "Nordeste",
+    CO_REGIAO_CURSO == 3 ~ "Sudeste",
+    CO_REGIAO_CURSO == 4 ~ "Sul",
+    CO_REGIAO_CURSO == 5 ~ "Centro-Oeste"
+  )
+)
+
+#sexo
+microdados_musica = microdados_musica %>% mutate(sexo = case_when(TP_SEXO == "M" ~ "Masculino",
+                                                          TP_SEXO == "F" ~ "Feminino"))
+
+microdados_musica = microdados_musica %>% mutate(
+  hestudos = case_when(
+    QE_I23 == "A" ~ "Nenhuma, apenas assisto às aulas",
+    QE_I23 == "B" ~ "De uma a três",
+    QE_I23 == "C" ~ "De quatro a sete",
+    QE_I23 == "D" ~ "De oito a doze",
+    QE_I23 == "E" ~ "Mais de doze"
+  )
+)
+
+head(microdados_musica) %>% kbl %>% kable_material_dark(full_width = T)
+
+```

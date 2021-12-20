@@ -37,3 +37,7 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# Htmls gerados pelo Markdown
+*.html
+MICRODADOS_ENADE_2017.txt
