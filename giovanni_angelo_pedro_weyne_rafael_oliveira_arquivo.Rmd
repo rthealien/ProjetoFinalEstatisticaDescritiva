@@ -205,8 +205,21 @@ Além disso é possível ver que a maioria da turma não tirou notas muito boas,
 
 Já o coeficiente de curtose `r microdados_descricao$curtose` indica uma curva Platicúrtica, o que faz com que a curva tenha uma aparência mais achatada.
 
-```{r}
+No histograma abaixo é possível notar que o pico das frequências fica antes da nota 50, assim como a frequência diminui bastante a partir da nota do Q3, já que ficaram apenas 25% dos alunos com notas entre `r microdados_descricao$Q3` (linha em verde) e `r microdados_descricao$maximo`.
 
+```{r graficos}
+g_hist = ggplot(microdados_musica_sem_NA, aes(x = NT_GER)) +
+  geom_histogram(color = "black",
+                 fill = "lightblue",
+                 bins = 20,
+                 aes(y = (..count..) / sum(..count..))) +
+  ggtitle("Histograma da nota dos alunos de Música (Licenciatura)") +
+  xlab("Nota Geral") +
+  ylab("Frequência relativa") +
+  geom_vline(aes(xintercept = microdados_descricao$mediana),col='red',size=1) +
+  geom_vline(aes(xintercept = microdados_descricao$Q3),col='green',size=1)
+
+ggplotly(g_hist)
 ```
 
 
