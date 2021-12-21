@@ -167,20 +167,32 @@ resumo_nas %>% kbl %>% kable_material_dark(full_width = F)
 
 ```{r descrevendo os dados}
 #Descrevendo
-microdados_musica_sem_NA %>% 
-  select(NT_GER) %>% 
-  summarise(  quantidade=n(),
-              media = mean(NT_GER),
-              mediana = median(NT_GER),
-              moda=Mode(NT_GER),
-              cv=sd(NT_GER)/media*100,
-              assimetria=skewness(NT_GER),
-              curtose=kurtosis(NT_GER)
-  ) %>% 
-  arrange(desc(mediana))  %>% 
-  kbl %>% 
-  kable_material_dark(full_width = F)
+microdados_descricao = microdados_musica_sem_NA %>%
+  select(NT_GER) %>%
+  summarise(
+    quantidade = n(),
+    media = mean(NT_GER),
+    mediana = median(NT_GER),
+    cv = sd(NT_GER) / media * 100,
+    assimetria = skewness(NT_GER),
+    curtose = kurtosis(NT_GER)
+  ) %>%
+  arrange(desc(mediana))
 
+moda = Mode(microdados_musica_sem_NA$NT_GER)
+
+microdados_descricao = microdados_descricao %>% mutate(
+  modas = case_when(
+    is.na(moda)[1]  ~ "Amodal",
+    length(moda) == 1 ~ as.character(moda[1]),
+    length(moda) == 2 ~ paste(moda[1],moda[2], sep = " e "),
+    TRUE ~ "Multimodal"
+  )
+)
+
+microdados_descricao %>%
+  kbl %>%
+  kable_material_dark(full_width = F)
 
 #Estatísticas resumo 
 summary(microdados_musica_sem_NA$NT_GER) 
