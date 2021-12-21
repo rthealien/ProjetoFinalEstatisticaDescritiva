@@ -40,25 +40,32 @@ enade2017 = read_csv2("MICRODADOS_ENADE_2017.txt")
 
 #B
 microdados_enade_filtrados = enade2017 %>% dplyr::select(
-  CO_GRUPO,
-  CO_REGIAO_CURSO,
-  NU_IDADE,
-  TP_SEXO,
-  CO_TURNO_GRADUACAO,
-  NT_GER,
-  QE_I01,
-  QE_I02,
-  QE_I08,
-  QE_I21,
-  QE_I23,
-  NT_OBJ_FG,
-  NT_OBJ_CE
+  CO_GRUPO, # Qualitativa Nominal
+  CO_REGIAO_CURSO, # Qualitativa Nominal
+  NU_IDADE, # Quantitativa Contínua
+  TP_SEXO, # Qualitativa Nominal
+  CO_TURNO_GRADUACAO, # Qualitativa Nominal
+  NT_GER, # Quantitativa Discreta ???
+  QE_I01, # Qualitativa Nominal
+  QE_I02, # Qualitativa Nominal
+  QE_I08, # Qualitativa Ordinal
+  QE_I23, # Qualitativa Ordinal
+  NT_OBJ_FG # Quantitativa Discreta !!!
 )
 
 #C
 microdados_musica = microdados_enade_filtrados %>% filter(CO_GRUPO == 4301)
 
 #D
+microdados_musica = microdados_musica %>% mutate(
+  turno_graduacao = case_when(
+    CO_TURNO_GRADUACAO == 1 ~ "Matutino",
+    CO_TURNO_GRADUACAO == 2 ~ "Vespertino",
+    CO_TURNO_GRADUACAO == 3 ~ "Integral",
+    CO_TURNO_GRADUACAO == 4 ~ "Noturno"
+    )
+)
+
 microdados_musica = microdados_musica %>% mutate(
   estado_civil = case_when(
     QE_I01 == "A" ~ "Solteiro(a)",
@@ -68,6 +75,29 @@ microdados_musica = microdados_musica %>% mutate(
     TRUE ~ "Outro"
   )
 )
+
+microdados_musica = microdados_musica %>% mutate(
+  raca = case_when(
+    QE_I02 ==    "A" ~ "Branca",
+    QE_I02 =="B" ~ "Preta",
+    QE_I02 =="C" ~ "Amarela",
+    QE_I02 =="D" ~ "Parda",
+    QE_I02 =="E" ~ "Indígena",
+    QE_I02 =="F" ~ "Não quero declarar"
+  )
+)
+
+microdados_musica = microdados_musica %>% mutate(
+  renda_familiar = case_when(
+    QE_I08 == "A" ~ "Até 1,5 salários mínimo (até R$ 1.405,50).",
+    QE_I08 == "B" ~ "De 1,5 a 3 salários mínimos (R$ 1.405,51 a R$ 2.811,00).",
+    QE_I08 == "C" ~ "De 3 a 4,5 salários mínimos (R$ 2.811,01 a R$ 4.216,50).",
+    QE_I08 == "D" ~ "De 4,5 a 6 salários mínimos (R$ 4.216,51 a R$ 5.622,00).",
+    QE_I08 == "E" ~ "De 6 a 10 salários mínimos (R$ 5. 622,01 a R$ 9.370,00).",
+    QE_I08 == "F" ~ "De 10 a 30 salários mínimo (R$ 9.370,01 a R$ 28.110,00)",
+    QE_I08 == "G" ~ "Acima de 30 salários mínimo (mais de R$ 28.110,00)."
+  )
+) 
 
 microdados_musica = microdados_musica %>% mutate(
   regiao = case_when(
@@ -96,6 +126,15 @@ microdados_musica = microdados_musica %>% mutate(
 head(microdados_musica) %>% kbl %>% kable_material_dark(full_width = T)
 ```
 
+E segue também a classificação das variáveis selecionadas
+
+```{r classificacao}
+qualitativa_quantitativa = c("Qualitativa Nominal", "Qualitativa Nominal","Quantitativa Contínua","Qualitativa Nominal","Qualitativa Nominal","Quantitativa Discreta ???","Qualitativa Nominal","Qualitativa Nominal","Qualitativa Ordinal", "Qualitativa Ordinal","Quantitativa Discreta")
+classifica_variaveis = data.frame("Variável" = names(microdados_enade_filtrados), "Classificação" = qualitativa_quantitativa)
+
+classifica_variaveis %>% kbl %>% kable_material_dark(full_width = T)
+```
+
 # Data quality e Bloco da análise descritiva das variaveis
 
 ## Limpando os dados
@@ -111,7 +150,7 @@ resumo_nas=microdados_musica %>%
 microdados_musica_sem_NA=microdados_musica %>% na.omit()
 ```
 
-O dataset filtrado com o curso de **Música(Licenciatura)** possui `r nrow(microdados_musica)` observações, destas foram identificados `r resumo_nas$QE_I01` registros com NA nas variáveis **QE_I01, QE_I02, QE_I08, QE_I21, QE_I23** e `r resumo_nas$NT_GER` registros com NA nas variávaies **NT_GER, NT_OBJ_FG, NT_OBJ_CE**. Removemos estes registros e passamos a ter um dataset com `r nrow(microdados_musica_sem_NA)` observações.
+O dataset filtrado com o curso de **Música(Licenciatura)** possui `r nrow(microdados_musica)` observações, destas foram identificados `r resumo_nas$QE_I01` registros com NA nas variáveis **QE_I01, QE_I02, QE_I08, QE_I23** e `r resumo_nas$NT_GER` registros com NA nas variávaies **NT_GER, NT_OBJ_FG**. Removemos estes registros e passamos a ter um dataset com `r nrow(microdados_musica_sem_NA)` observações.
 
 ```{r limpando os dados_2}
 #E
@@ -129,14 +168,14 @@ resumo_nas %>% kbl %>% kable_material_dark(full_width = F)
 ```{r descrevendo os dados}
 #Descrevendo
 microdados_musica_sem_NA %>% 
-  select(NT_OBJ_CE) %>% 
+  select(NT_GER) %>% 
   summarise(  quantidade=n(),
-              media = mean(NT_OBJ_CE),
-              mediana = median(NT_OBJ_CE),
-              moda=Mode(NT_OBJ_CE),
-              cv=sd(NT_OBJ_CE)/media*100,
-              assimetria=skewness(NT_OBJ_CE),
-              curtose=kurtosis(NT_OBJ_CE)
+              media = mean(NT_GER),
+              mediana = median(NT_GER),
+              moda=Mode(NT_GER),
+              cv=sd(NT_GER)/media*100,
+              assimetria=skewness(NT_GER),
+              curtose=kurtosis(NT_GER)
   ) %>% 
   arrange(desc(mediana))  %>% 
   kbl %>% 
@@ -144,7 +183,7 @@ microdados_musica_sem_NA %>%
 
 
 #Estatísticas resumo 
-summary(microdados_musica_sem_NA$NT_OBJ_CE) 
+summary(microdados_musica_sem_NA$NT_GER) 
 
 ```
 
