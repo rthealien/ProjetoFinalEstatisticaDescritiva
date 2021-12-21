@@ -221,6 +221,111 @@ g_hist = ggplot(microdados_musica_sem_NA, aes(x = NT_GER)) +
 
 ggplotly(g_hist)
 ```
+# Análise referentes a turno e cor ou raça
+
+## Análise por Raça/Cor
+```{r análise raca/cor - tabela }
+microdados_musica_raca = microdados_musica_sem_NA %>%
+  select(raca, NT_GER) %>%
+  group_by(raca) %>%
+  summarise(
+    quantidade = n(),
+    media = mean(NT_GER, na.rm = T),
+    mediana = median(NT_GER, na.rm = T),
+    cv = sd(NT_GER, na.rm = T) / media * 100,
+    amplitude_interquartil = IQR(NT_GER)
+  ) %>%
+  arrange(desc(mediana))
+
+microdados_musica_raca %>%
+  kbl %>%
+  kable_material_dark(full_width = F)
+```
+
+Agrupando os resultados pela Raça ou Cor conseguimos notar que a maior quantidade de alunos é da cor `r head(microdados_musica_raca  %>% arrange(desc(quantidade)) %>%  select(raca),1)` com um total de `r max(microdados_musica_raca$quantidade)`. Alunos auto declarados Brancos também possuem a maior mediana dentre os outros grupos.
+
+Indígena foi a raça/cor com o menor número de estudantes, seguida pela Amarela, mas em termos de nota, os amarelos ficaram em terceiro pela mediana enquanto os Indígenas tiveram as piores notas.
+
+Segue abaixo um gráfico bloxpot para uma melhor visualização dos resultados.
+```{r análise raca/cor - bloxpot}
+
+grafico_boxplot1 = ggplot(microdados_musica_sem_NA,
+                          aes(x = raca, y = NT_GER, fill =
+                                raca)) +
+  geom_boxplot() +
+  ggtitle("Gráfico de Box-plot da Nota por Raça/Cor") +
+  xlab("Raça/Cor") +
+  ylab("Notas")
+ggplotly(grafico_boxplot1)
+```
+## Análise por Turno
+```{r análise por turno - tabela}
+microdados_musica_turno = microdados_musica_sem_NA %>%
+  select(turno_graduacao, NT_GER) %>%
+  group_by(turno_graduacao) %>%
+  summarise(
+    quantidade = n(),
+    media = mean(NT_GER, na.rm = T),
+    mediana = median(NT_GER, na.rm = T),
+    cv = sd(NT_GER, na.rm = T) / media * 100,
+    amplitude_interquartil = IQR(NT_GER)
+  ) %>%
+  arrange(desc(mediana))
+
+microdados_musica_turno %>%
+  kbl %>%
+  kable_material_dark(full_width = F)
+```
+
+Agrupando os resultados pelo Turno conseguimos notar que a maior quantidade de alunos estuda no turno Integral ou da Noite, enquanto o número de alunos no período Noturno e Vespertino é bem melhor.
+
+Já na questão das notas, percebemos que os períodos Integral e Matutino possuem uma mediana melhor. Talvez pelo turno da noite ser mais frequentado por trabalhadores que muitas vezes já assistem as aulas cansados do expediente de trabalho e o Vespertino geralmente possuir pessoas mais jovens, são os turnos com menores medianas.
+
+Segue abaixo um gráfico bloxpot para uma melhor visualização dos resultados.
+
+```{r análise por turno - bloxpot}
+
+grafico_boxplot2 = ggplot(microdados_musica_sem_NA,
+                          aes(x = turno_graduacao, y = NT_GER, fill =
+                                turno_graduacao)) +
+  geom_boxplot() +
+  ggtitle("Gráfico de Box-plot da Nota por turno") +
+  xlab("Turno") +
+  ylab("Notas")
+ggplotly(grafico_boxplot2)
+```
+
+## Análise cruzada por turno e raça/cor
+
+```{r analise cruzada}
+microdados_musica_turno_raca = microdados_musica_sem_NA %>%
+  select(raca, NT_GER, turno_graduacao) %>%
+  group_by(raca, turno_graduacao) %>%
+  summarise(
+    quantidade = n(),
+    media = mean(NT_GER, na.rm = T),
+    mediana = median(NT_GER, na.rm = T),
+    cv = sd(NT_GER, na.rm = T) / media * 100,
+    amplitude_interquartil = IQR(NT_GER)
+  ) %>%
+  arrange(desc(mediana))
+
+microdados_musica_turno_raca %>%
+  kbl %>%
+  kable_material_dark(full_width = F)
+
+
+grafico_boxplot3 = ggplot(microdados_musica_sem_NA,
+                          aes(x = turno_graduacao, y = NT_GER, fill =
+                                turno_graduacao)) +
+  geom_boxplot() +
+  ggtitle("Gráfico de Box-plot da Nota por Turno e Raça/Cor") +
+  xlab("Turno") +
+  ylab("Notas") +
+  facet_wrap(~raca,nrow = 2,ncol = 3)
+ggplotly(grafico_boxplot3)
+
+```
 
 
 
