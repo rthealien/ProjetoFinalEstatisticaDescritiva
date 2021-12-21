@@ -100,9 +100,7 @@ head(microdados_musica) %>% kbl %>% kable_material_dark(full_width = T)
 
 ## Limpando os dados
 
-O dataset filtrado com o curso de **Música(Licenciatura)** possui 3974 observações, destas foram identificados 773 registros com NA nas variáveis **QE_I01, QE_I02, QE_I08, QE_I21, QE_I23** e 1044 registros com NA nas variávaies **NT_GER, NT_OBJ_FG, NT_OBJ_CE**. Removemos estes registros e passamos a ter um dataset com 2753 observações.
-
-```{r limpando os dados}
+```{r limpando os dados_1}
 #E
 #Contabilizando os Na´s
 resumo_nas=microdados_musica %>%
@@ -111,6 +109,12 @@ resumo_nas=microdados_musica %>%
 
 #Removendo  Na´S De todas As variáveis que possuem NA
 microdados_musica_sem_NA=microdados_musica %>% na.omit()
+```
+
+O dataset filtrado com o curso de **Música(Licenciatura)** possui `r nrow(microdados_musica)` observações, destas foram identificados `r resumo_nas$QE_I01` registros com NA nas variáveis **QE_I01, QE_I02, QE_I08, QE_I21, QE_I23** e `r resumo_nas$NT_GER` registros com NA nas variávaies **NT_GER, NT_OBJ_FG, NT_OBJ_CE**. Removemos estes registros e passamos a ter um dataset com `r nrow(microdados_musica_sem_NA)` observações.
+
+```{r limpando os dados_2}
+#E
 
 #Verificando se foram retirados os NA´S
 resumo_nas=microdados_musica_sem_NA %>%
