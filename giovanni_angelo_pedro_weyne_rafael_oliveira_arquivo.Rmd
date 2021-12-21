@@ -32,11 +32,13 @@ lapply(vetor_pacotes, require, character.only = TRUE)
 
 ## Introdução
 
-Neste projeto vamos fazer uma análise dos dados do ENADE de 2017 referentes ao curso **Música(Licenciatura)**. Segue abaixo uma prévia dos dados importados, filtrados e tratados.
+Neste projeto vamos fazer uma análise dos dados do ENADE de 2017 referentes ao curso **Música(Licenciatura)**. Segue abaixo uma prévia dos dados importados, filtrados e com rótulos tratados.
 
 ```{r intro}
+#A
 enade2017 = read_csv2("MICRODADOS_ENADE_2017.txt")
 
+#B
 microdados_enade_filtrados = enade2017 %>% dplyr::select(
   CO_GRUPO,
   CO_REGIAO_CURSO,
@@ -53,9 +55,10 @@ microdados_enade_filtrados = enade2017 %>% dplyr::select(
   NT_OBJ_CE
 )
 
+#C
 microdados_musica = microdados_enade_filtrados %>% filter(CO_GRUPO == 4301)
 
-
+#D
 microdados_musica = microdados_musica %>% mutate(
   estado_civil = case_when(
     QE_I01 == "A" ~ "Solteiro(a)",
@@ -91,5 +94,55 @@ microdados_musica = microdados_musica %>% mutate(
 )
 
 head(microdados_musica) %>% kbl %>% kable_material_dark(full_width = T)
+```
+
+# Data quality e Bloco da análise descritiva das variaveis
+
+## Limpando os dados
+
+O dataset filtrado com o curso de **Música(Licenciatura)** possui 3974 observações, destas foram identificados 773 registros com NA nas variáveis **QE_I01, QE_I02, QE_I08, QE_I21, QE_I23** e 1044 registros com NA nas variávaies **NT_GER, NT_OBJ_FG, NT_OBJ_CE**. Removemos estes registros e passamos a ter um dataset com 2753 observações.
+
+```{r limpando os dados}
+#E
+#Contabilizando os Na´s
+resumo_nas=microdados_musica %>%
+  select(everything()) %>%  
+  summarise_all(list(~sum(is.na(.))))
+
+#Removendo  Na´S De todas As variáveis que possuem NA
+microdados_musica_sem_NA=microdados_musica %>% na.omit()
+
+#Verificando se foram retirados os NA´S
+resumo_nas=microdados_musica_sem_NA %>%
+  select(everything()) %>%  
+  summarise_all(list(~sum(is.na(.))))
+
+resumo_nas %>% kbl %>% kable_material_dark(full_width = F)
+```
+
+## Descrevendo os dados
+
+```{r descrevendo os dados}
+#Descrevendo
+microdados_musica_sem_NA %>% 
+  select(NT_OBJ_CE) %>% 
+  summarise(  quantidade=n(),
+              media = mean(NT_OBJ_CE),
+              mediana = median(NT_OBJ_CE),
+              moda=Mode(NT_OBJ_CE),
+              cv=sd(NT_OBJ_CE)/media*100,
+              assimetria=skewness(NT_OBJ_CE),
+              curtose=kurtosis(NT_OBJ_CE)
+  ) %>% 
+  arrange(desc(mediana))  %>% 
+  kbl %>% 
+  kable_material_dark(full_width = F)
+
+
+#Estatísticas resumo 
+summary(microdados_musica_sem_NA$NT_OBJ_CE) 
 
 ```
+
+
+
