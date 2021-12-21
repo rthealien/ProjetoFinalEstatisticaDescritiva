@@ -171,8 +171,12 @@ microdados_descricao = microdados_musica_sem_NA %>%
   select(NT_GER) %>%
   summarise(
     quantidade = n(),
+    minimo = quantile(NT_GER,0), 
+    Q1 = quantile(NT_GER,0.25),
     media = mean(NT_GER),
     mediana = median(NT_GER),
+    Q3 = quantile(NT_GER,0.75),
+    maximo = quantile(NT_GER,1),
     cv = sd(NT_GER) / media * 100,
     assimetria = skewness(NT_GER),
     curtose = kurtosis(NT_GER)
@@ -194,8 +198,14 @@ microdados_descricao %>%
   kbl %>%
   kable_material_dark(full_width = F)
 
-#Estatísticas resumo 
-summary(microdados_musica_sem_NA$NT_GER) 
+```
+Pelas dados acima conseguimos perceber que de acordo com o valor alto do coeficiente de variação (`r microdados_descricao$cv`), a mediana é mais confiável do que a média, embora as duas estejam com valores muito próximos.
+
+Além disso é possível ver que a maioria da turma não tirou notas muito boas, já que 75% tiraram até `r microdados_descricao$Q3` e a mediana ficou em `r microdados_descricao$mediana` não chegando nem a metade do valor do total da prova que é 100. Outro fato que corrabora com essa dedução é uma existe uma assimetria positiva `r microdados_descricao$assimetria` indicando que o a curva tende a ser maior no lado esquerdo do eixo, onde as notas são menores.
+
+Já o coeficiente de curtose `r microdados_descricao$curtose` indica uma curva Platicúrtica, o que faz com que a curva tenha uma aparência mais achatada.
+
+```{r}
 
 ```
 
