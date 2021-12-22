@@ -139,9 +139,11 @@ classifica_variaveis = data.frame("Variável" = names(microdados_enade_filtrados
 classifica_variaveis %>% kbl %>% kable_material_dark(full_width = T)
 ```
 
-# Data quality e Bloco da análise descritiva das variaveis
+# Data quality e Bloco da análise descritiva das variáveis
 
 ## Limpando os dados
+
+Contabilizando os NA´s
 
 ```{r limpando os dados_1}
 #E
@@ -157,6 +159,8 @@ microdados_musica_sem_NA=microdados_musica %>% na.omit()
 ```
 
 O dataset filtrado com o curso de **Música(Licenciatura)** possui `r nrow(microdados_musica)` observações, destas foram identificados `r resumo_nas$QE_I01` registros com NA nas variáveis **QE_I01, QE_I02, QE_I08, QE_I23** e `r resumo_nas$NT_GER` registros com NA nas variávaies **NT_GER, NT_OBJ_FG**. Removemos estes registros e passamos a ter um dataset com `r nrow(microdados_musica_sem_NA)` observações.
+
+Dataset sem NA
 
 ```{r limpando os dados_2}
 #E
@@ -228,7 +232,7 @@ g_hist = ggplot(microdados_musica_sem_NA, aes(x = NT_GER)) +
 
 ggplotly(g_hist)
 ```
-# Análise referentes a turno e cor ou raça
+# Análise referentes a Turno e Raça/Cor
 
 ## Análise por Raça/Cor
 ```{r análise raca/cor - tabela }
@@ -249,9 +253,9 @@ microdados_musica_raca %>%
   kable_material_dark(full_width = F)
 ```
 
-Agrupando os resultados pela Raça ou Cor conseguimos notar que a maior quantidade de alunos é da cor `r head(microdados_musica_raca  %>% arrange(desc(quantidade)) %>%  select(raca),1)` com um total de `r max(microdados_musica_raca$quantidade)`. Alunos auto declarados Brancos também possuem a maior mediana dentre os outros grupos.
+Agrupando os resultados pela Raça/Cor conseguimos notar que a maior quantidade de alunos é da cor `r head(microdados_musica_raca  %>% arrange(desc(quantidade)) %>%  select(raca),1)` com um total de `r max(microdados_musica_raca$quantidade)`. Alunos auto declarados Brancos também possuem a maior mediana dentre os outros grupos.
 
-Indígena foi a raça/cor com o menor número de estudantes, seguida pela Amarela, mas em termos de nota, os amarelos ficaram em terceiro pela mediana enquanto os Indígenas tiveram as piores notas.
+Indígena foi a Raça/Cor com o menor número de estudantes, seguida pela Amarela, mas em termos de nota, os amarelos ficaram em terceiro pela mediana enquanto os Indígenas tiveram as piores notas.
 
 Segue abaixo um gráfico bloxpot para uma melhor visualização dos resultados.
 ```{r análise raca/cor - bloxpot}
@@ -284,7 +288,7 @@ microdados_musica_turno %>%
   kable_material_dark(full_width = F)
 ```
 
-Agrupando os resultados pelo Turno conseguimos notar que a maior quantidade de alunos estuda no turno Integral ou da Noite, enquanto o número de alunos no período Noturno e Vespertino é bem melhor.
+Agrupando os resultados pelo Turno conseguimos notar que a maior quantidade de alunos estuda no turno Integral ou da Noite, enquanto o número de alunos no período Matutino e Vespertino é bem menor.
 
 Já na questão das notas, percebemos que os períodos Integral e Matutino possuem uma mediana melhor. Talvez pelo turno da noite ser mais frequentado por trabalhadores que muitas vezes já assistem as aulas cansados do expediente de trabalho e o Vespertino geralmente possuir pessoas mais jovens, são os turnos com menores medianas.
 
@@ -302,7 +306,7 @@ grafico_boxplot2 = ggplot(microdados_musica_sem_NA,
 ggplotly(grafico_boxplot2)
 ```
 
-## Análise por renda familiar
+## Análise por Renda Familiar
 
 ```{r analise por renda - Tabela}
 
@@ -326,7 +330,7 @@ microdados_musica_renda %>%
 
 Quando agrupamos os resultados pela renda familiar, é possível notar que quanto maior a renda familiar, menor a quantidade de alunos.
 
-Quanto as notas, tirando alguns pontos fora da curva, quanto maior a renda, maior também a media dos alunos.Provavelmente, pessoas com renda familiar mais baixa precisa se concentrar em ajudar nas contas de casa o que pode ocasionar uma menor dedicação aos estudos. Enquanto os alunos que podem se dedicar única e exclusivamente para os estudos, por consequência conseguem notas mais altas.
+Quanto as notas, tirando alguns pontos fora da curva, quanto maior a renda, maior também a média dos alunos. Provavelmente, pessoas com renda familiar mais baixa precisam se concentrar em ajudar nas contas de casa o que pode ocasionar uma menor dedicação aos estudos. Enquanto os alunos que podem se dedicar única e exclusivamente para os estudos, por consequência conseguem notas mais altas.
 
 Segue abaixo um gráfico bloxpot para uma melhor visualização dos resultados.
 
