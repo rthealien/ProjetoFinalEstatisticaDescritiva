@@ -302,35 +302,9 @@ grafico_boxplot2 = ggplot(microdados_musica_sem_NA,
 ggplotly(grafico_boxplot2)
 ```
 
-## Análise cruzada por raça/cor e renda familiar
+## Análise por renda familiar
 
-```{r analise cruzada}
-#microdados_musica_turno_raca = microdados_musica_sem_NA %>%
-#  select(raca, NT_GER, turno_graduacao) %>%
-#  group_by(raca, turno_graduacao) %>%
-#  summarise(
-#    quantidade = n(),
-#    media = mean(NT_GER, na.rm = T),
-#    mediana = median(NT_GER, na.rm = T),
-#    cv = sd(NT_GER, na.rm = T) / media * 100,
-#    amplitude_interquartil = IQR(NT_GER)
-#  ) %>%
-#  arrange(desc(mediana))
-#
-#microdados_musica_turno_raca %>%
-#  kbl %>%
-#  kable_material_dark(full_width = F)
-#
-#
-#grafico_boxplot3 = ggplot(microdados_musica_sem_NA,
-#                          aes(x = turno_graduacao, y = NT_GER, fill =
-#                                turno_graduacao)) +
-#  geom_boxplot() +
-#  ggtitle("Gráfico de Box-plot da Nota por Turno e Raça/Cor") +
-#  xlab("Turno") +
-#  ylab("Notas") +
-#  facet_wrap(~raca,nrow = 2,ncol = 3)
-#ggplotly(grafico_boxplot3)
+```{r analise por renda - Tabela}
 
 
 microdados_musica_renda = microdados_musica_sem_NA %>%
@@ -348,21 +322,18 @@ microdados_musica_renda = microdados_musica_sem_NA %>%
 microdados_musica_renda %>%
   kbl %>%
   kable_material_dark(full_width = F)
-#
-#
-#grafico_boxplot3 = ggplot(microdados_musica_sem_NA,
-#                          aes(x = renda_familiar, y = NT_GER, fill =
-#                                renda_familiar)) +
-#  geom_boxplot() +
-#  ggtitle("Gráfico de Box-plot da Nota por raça/cor e renda familiar") +
-#  xlab("Renda Familiar") +
-#  ylab("Notas") +
-#  facet_wrap(~raca,nrow = 2,ncol = 3)
-#ggplotly(grafico_boxplot3)
+```
 
-grafico_boxplot3 = ggplot(microdados_musica_sem_NA, aes(y = NT_GER, x = reorder(QE_I08, renda_familiar), fill = QE_I08)) +
+Quando agrupamos os resultados pela renda familiar, é possível notar que quanto maior a renda familiar, menor a quantidade de alunos.
+
+Quanto as notas, tirando alguns pontos fora da curva, quanto maior a renda, maior também a media dos alunos.Provavelmente, pessoas com renda familiar mais baixa precisa se concentrar em ajudar nas contas de casa o que pode ocasionar uma menor dedicação aos estudos. Enquanto os alunos que podem se dedicar única e exclusivamente para os estudos, por consequência conseguem notas mais altas.
+
+Segue abaixo um gráfico bloxpot para uma melhor visualização dos resultados.
+
+```{r analise por renda}
+grafico_boxplot3 = ggplot(microdados_musica_sem_NA, aes(y = NT_GER, x = reorder(QE_I08, renda_familiar), fill = renda_familiar)) +
   geom_boxplot() +
-  ggtitle("Gráfico histograma da Nota por raça e renda familiar") +
+  ggtitle("Gráfico da Nota por renda familiar") +
   ylab("Notas") +
   xlab("Renda Familiar") +
   theme(axis.title.x=element_blank(),
