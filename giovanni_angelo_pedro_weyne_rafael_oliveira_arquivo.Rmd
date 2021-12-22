@@ -201,7 +201,7 @@ microdados_descricao %>%
 ```
 Pelas dados acima conseguimos perceber que de acordo com o valor alto do coeficiente de variação (`r microdados_descricao$cv`), a mediana é mais confiável do que a média, embora as duas estejam com valores muito próximos.
 
-Além disso é possível ver que a maioria da turma não tirou notas muito boas, já que 75% tiraram até `r microdados_descricao$Q3` e a mediana ficou em `r microdados_descricao$mediana` não chegando nem a metade do valor do total da prova que é 100. Outro fato que corrabora com essa dedução é uma existe uma assimetria positiva `r microdados_descricao$assimetria` indicando que o a curva tende a ser maior no lado esquerdo do eixo, onde as notas são menores.
+Além disso é possível ver que a maioria da turma não tirou notas muito boas, já que 75% tiraram até `r microdados_descricao$Q3` e a mediana ficou em `r microdados_descricao$mediana` não chegando nem a metade do valor do total da prova que é 100. Outro fato que corrabora com essa dedução é uma assimetria positiva `r microdados_descricao$assimetria` indicando que o a curva tende a ser maior no lado esquerdo do eixo, onde as notas são menores.
 
 Já o coeficiente de curtose `r microdados_descricao$curtose` indica uma curva Platicúrtica, o que faz com que a curva tenha uma aparência mais achatada.
 
@@ -295,12 +295,40 @@ grafico_boxplot2 = ggplot(microdados_musica_sem_NA,
 ggplotly(grafico_boxplot2)
 ```
 
-## Análise cruzada por turno e raça/cor
+## Análise cruzada por raça/cor e renda familiar
 
 ```{r analise cruzada}
-microdados_musica_turno_raca = microdados_musica_sem_NA %>%
-  select(raca, NT_GER, turno_graduacao) %>%
-  group_by(raca, turno_graduacao) %>%
+#microdados_musica_turno_raca = microdados_musica_sem_NA %>%
+#  select(raca, NT_GER, turno_graduacao) %>%
+#  group_by(raca, turno_graduacao) %>%
+#  summarise(
+#    quantidade = n(),
+#    media = mean(NT_GER, na.rm = T),
+#    mediana = median(NT_GER, na.rm = T),
+#    cv = sd(NT_GER, na.rm = T) / media * 100,
+#    amplitude_interquartil = IQR(NT_GER)
+#  ) %>%
+#  arrange(desc(mediana))
+#
+#microdados_musica_turno_raca %>%
+#  kbl %>%
+#  kable_material_dark(full_width = F)
+#
+#
+#grafico_boxplot3 = ggplot(microdados_musica_sem_NA,
+#                          aes(x = turno_graduacao, y = NT_GER, fill =
+#                                turno_graduacao)) +
+#  geom_boxplot() +
+#  ggtitle("Gráfico de Box-plot da Nota por Turno e Raça/Cor") +
+#  xlab("Turno") +
+#  ylab("Notas") +
+#  facet_wrap(~raca,nrow = 2,ncol = 3)
+#ggplotly(grafico_boxplot3)
+
+
+microdados_musica_raca_renda = microdados_musica_sem_NA %>%
+  select(raca, NT_GER, renda_familiar) %>%
+  group_by(raca, renda_familiar) %>%
   summarise(
     quantidade = n(),
     media = mean(NT_GER, na.rm = T),
@@ -310,20 +338,28 @@ microdados_musica_turno_raca = microdados_musica_sem_NA %>%
   ) %>%
   arrange(desc(mediana))
 
-microdados_musica_turno_raca %>%
+microdados_musica_raca_renda %>%
   kbl %>%
   kable_material_dark(full_width = F)
+#
+#
+#grafico_boxplot3 = ggplot(microdados_musica_sem_NA,
+#                          aes(x = renda_familiar, y = NT_GER, fill =
+#                                renda_familiar)) +
+#  geom_boxplot() +
+#  ggtitle("Gráfico de Box-plot da Nota por raça/cor e renda familiar") +
+#  xlab("Renda Familiar") +
+#  ylab("Notas") +
+#  facet_wrap(~raca,nrow = 2,ncol = 3)
+#ggplotly(grafico_boxplot3)
 
+grafico_histograma2 = ggplot(microdados_musica_sem_NA, aes(x = NT_GER, fill = raca)) +
+  geom_histogram() +
+  ggtitle("Gráfico histograma da Nota por raça e renda familiar") +
+  xlab("Notas") +
+  ylab("Renda Familiar")
 
-grafico_boxplot3 = ggplot(microdados_musica_sem_NA,
-                          aes(x = turno_graduacao, y = NT_GER, fill =
-                                turno_graduacao)) +
-  geom_boxplot() +
-  ggtitle("Gráfico de Box-plot da Nota por Turno e Raça/Cor") +
-  xlab("Turno") +
-  ylab("Notas") +
-  facet_wrap(~raca,nrow = 2,ncol = 3)
-ggplotly(grafico_boxplot3)
+ggplotly(grafico_histograma2)
 
 ```
 
