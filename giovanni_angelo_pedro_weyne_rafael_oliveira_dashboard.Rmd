@@ -3,7 +3,7 @@ title: "Dashboard - Projeto Final - Estatística Descritiva"
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
-    vertical_layout: scroll
+    vertical_layout: fill
 ---
 
 ```{r setup, include=FALSE}
@@ -83,7 +83,7 @@ microdados_geral_sem_NA = microdados_enade_filtrados %>% na.omit()
 Row
 -----------------------------------------------------------------------
 
-### Total de alunos
+### Total de alunos (Música)
 
 ```{r}
 valueBox(nrow(microdados_musica), icon = "fa-pencil")
@@ -97,19 +97,25 @@ valueBox(resumo_nas$NT_GER,
          color = "warning")
 ```
 
-### Alunos após limpeza
+### Alunos após limpeza (Música)
 
 ```{r}
 valueBox(nrow(microdados_musica_sem_NA), icon = "fa-check", color = "success")
 ```
 
+### Alunos de Música comparados ao total
 
-
+```{r}
+rate <- round((nrow(microdados_musica_sem_NA)/nrow(microdados_geral_sem_NA)) * 100,2)
+gauge(rate, min = 0, max = 100, symbol = '%', gaugeSectors(
+  success = c(0, 100)
+))
+```
 
 Column {data-width=650}
 -----------------------------------------------------------------------
 
-### Total de alunos por Raça/Cor
+### Total de alunos por Raça/Cor (Música)
 
 ```{r}
 microdados_musica_raca = microdados_musica_sem_NA %>%
@@ -117,17 +123,30 @@ microdados_musica_raca = microdados_musica_sem_NA %>%
   group_by(raca) %>%
   summarise(
     quantidade = n()
-  )
+  ) %>% 
+arrange(desc(quantidade))
 
 
-myPalette <- brewer.pal(6, "Set2") 
+#myPalette <- brewer.pal(6, "Set2") 
 
-pie(microdados_musica_raca$quantidade,labels=microdados_musica_raca$quantidade, border="white", col = myPalette)
-legend(.8,.8, microdados_musica_raca$raca, cex = 0.7, fill = myPalette)
+#pie(microdados_musica_raca$quantidade,labels=microdados_musica_raca$quantidade, border="white", col = myPalette)
+#legend(.8,.8, microdados_musica_raca$raca, cex = 0.7, fill = myPalette)
+
+
+microdados_musica_raca$raca <- factor(microdados_musica_raca$raca, levels = unique(microdados_musica_raca$raca)[order(microdados_musica_raca$quantidade, decreasing = FALSE)])
+
+p<-ggplot(data=microdados_musica_raca, aes(x=quantidade, y=raca,fill = raca)) +
+  geom_bar(stat="identity") +
+  theme_minimal() +
+  ylab("Raça/Cor") +
+  xlab("Quantidade de alunos") +
+  theme(legend.position="none")
+
+ggplotly(p)
 
 ```
 
-### Total de alunos por Turno
+### Total de alunos por Turno (Música)
 
 ```{r}
 microdados_musica_turno = microdados_musica_sem_NA %>%
@@ -138,10 +157,21 @@ microdados_musica_turno = microdados_musica_sem_NA %>%
   )
 
 
-myPalette <- brewer.pal(6, "Set2") 
+#myPalette <- brewer.pal(6, "Set2") 
+#pie(microdados_musica_turno$quantidade,labels=microdados_musica_turno$quantidade, border="white", col = myPalette)
+#legend(1.1, .1, microdados_musica_turno$turno_graduacao, cex = 0.7, fill = myPalette)
 
-pie(microdados_musica_turno$quantidade,labels=microdados_musica_turno$quantidade, border="white", col = myPalette)
-legend(1.1, .1, microdados_musica_turno$turno_graduacao, cex = 0.7, fill = myPalette)
+microdados_musica_turno$turno_graduacao <- factor(microdados_musica_turno$turno_graduacao, levels = unique(microdados_musica_turno$turno_graduacao)[order(microdados_musica_turno$quantidade, decreasing = FALSE)])
+
+p<-ggplot(data=microdados_musica_turno, aes(x=turno_graduacao, y=quantidade,fill = turno_graduacao)) +
+  geom_bar(stat="identity") +
+  theme_minimal() +
+  xlab("Turno Graduação") +
+  ylab("Quantidade de alunos") +
+  scale_fill_manual(values=c("#f48225", "#249efb", "#000a99","#d9d628")) +
+  theme(legend.position="none")
+
+ggplotly(p)
 
 ```
 
