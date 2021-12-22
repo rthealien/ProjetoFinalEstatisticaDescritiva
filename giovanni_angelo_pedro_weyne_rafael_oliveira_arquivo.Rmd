@@ -2,7 +2,9 @@
 title: "Projeto Final - Estatística Descritiva"
 author: "Giovanni Angelo, Pedro Weyne, Rafael Oliveira"
 date: "20/12/2021"
-output: html_document
+output: 
+  html_document: 
+    theme: cerulean
 ---
 
 ```{r setup, include=FALSE}
@@ -25,7 +27,8 @@ vetor_pacotes = c(
   "Hmisc",
   "DescTools",
   "kableExtra",
-  "gridExtra"
+  "gridExtra",
+  "rmarkdown"
 )
 lapply(vetor_pacotes, require, character.only = TRUE)
 ```
@@ -123,7 +126,8 @@ microdados_musica = microdados_musica %>% mutate(
   )
 )
 
-head(microdados_musica) %>% kbl %>% kable_material_dark(full_width = T)
+paged_table(head(microdados_musica)) 
+#%>% kbl %>% kable_material_dark(full_width = T)
 ```
 
 E segue também a classificação das variáveis selecionadas
@@ -146,6 +150,8 @@ resumo_nas=microdados_musica %>%
   select(everything()) %>%  
   summarise_all(list(~sum(is.na(.))))
 
+resumo_nas %>% paged_table()
+
 #Removendo  Na´S De todas As variáveis que possuem NA
 microdados_musica_sem_NA=microdados_musica %>% na.omit()
 ```
@@ -160,7 +166,8 @@ resumo_nas=microdados_musica_sem_NA %>%
   select(everything()) %>%  
   summarise_all(list(~sum(is.na(.))))
 
-resumo_nas %>% kbl %>% kable_material_dark(full_width = F)
+resumo_nas %>% paged_table()
+#  kbl %>% kable_material_dark(full_width = F)
 ```
 
 ## Descrevendo os dados
