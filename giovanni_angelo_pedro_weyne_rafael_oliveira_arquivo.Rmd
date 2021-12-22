@@ -326,9 +326,9 @@ ggplotly(grafico_boxplot2)
 #ggplotly(grafico_boxplot3)
 
 
-microdados_musica_raca_renda = microdados_musica_sem_NA %>%
-  select(raca, NT_GER, renda_familiar) %>%
-  group_by(raca, renda_familiar) %>%
+microdados_musica_renda = microdados_musica_sem_NA %>%
+  select(NT_GER, renda_familiar, QE_I08) %>%
+  group_by(renda_familiar) %>%
   summarise(
     quantidade = n(),
     media = mean(NT_GER, na.rm = T),
@@ -336,9 +336,9 @@ microdados_musica_raca_renda = microdados_musica_sem_NA %>%
     cv = sd(NT_GER, na.rm = T) / media * 100,
     amplitude_interquartil = IQR(NT_GER)
   ) %>%
-  arrange(desc(mediana))
+  arrange(mediana)
 
-microdados_musica_raca_renda %>%
+microdados_musica_renda %>%
   kbl %>%
   kable_material_dark(full_width = F)
 #
@@ -353,13 +353,16 @@ microdados_musica_raca_renda %>%
 #  facet_wrap(~raca,nrow = 2,ncol = 3)
 #ggplotly(grafico_boxplot3)
 
-grafico_histograma2 = ggplot(microdados_musica_sem_NA, aes(x = NT_GER, fill = raca)) +
-  geom_histogram() +
+grafico_boxplot3 = ggplot(microdados_musica_sem_NA, aes(y = NT_GER, x = reorder(QE_I08, renda_familiar), fill = QE_I08)) +
+  geom_boxplot() +
   ggtitle("Gráfico histograma da Nota por raça e renda familiar") +
-  xlab("Notas") +
-  ylab("Renda Familiar")
+  ylab("Notas") +
+  xlab("Renda Familiar") +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
 
-ggplotly(grafico_histograma2)
+ggplotly(grafico_boxplot3)
 
 ```
 
