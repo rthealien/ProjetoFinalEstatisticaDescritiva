@@ -1,0 +1,178 @@
+---
+title: "Dashboard - Projeto Final - Estatística Descritiva"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+
+#carrega os pacotes necessários
+vetor_pacotes = c(
+  "readr",
+  "ggplot2",
+  "plotly",
+  "e1071",
+  "dplyr",
+  "Hmisc",
+  "DescTools",
+  "kableExtra",
+  "gridExtra",
+  "RColorBrewer"
+)
+lapply(vetor_pacotes, require, character.only = TRUE)
+```
+
+```{r importando a base}
+
+#A
+enade2017 = read_csv2("MICRODADOS_ENADE_2017.txt")
+
+#B
+microdados_enade_filtrados = enade2017 %>% dplyr::select(
+  CO_GRUPO, # Qualitativa Nominal
+  CO_REGIAO_CURSO, # Qualitativa Nominal
+  NU_IDADE, # Quantitativa Contínua
+  TP_SEXO, # Qualitativa Nominal
+  CO_TURNO_GRADUACAO, # Qualitativa Nominal
+  NT_GER, # Quantitativa Discreta ???
+  QE_I01, # Qualitativa Nominal
+  QE_I02, # Qualitativa Nominal
+  QE_I08, # Qualitativa Ordinal
+  QE_I23, # Qualitativa Ordinal
+  NT_OBJ_FG # Quantitativa Discreta !!!
+)
+
+#C
+microdados_musica = microdados_enade_filtrados %>% filter(CO_GRUPO == 4301)
+
+microdados_musica = microdados_musica %>% mutate(
+  raca = case_when(
+    QE_I02 ==    "A" ~ "Branca",
+    QE_I02 =="B" ~ "Preta",
+    QE_I02 =="C" ~ "Amarela",
+    QE_I02 =="D" ~ "Parda",
+    QE_I02 =="E" ~ "Indígena",
+    QE_I02 =="F" ~ "Não quero declarar"
+  )
+)
+
+microdados_musica = microdados_musica %>% mutate(
+  turno_graduacao = case_when(
+    CO_TURNO_GRADUACAO == 1 ~ "Matutino",
+    CO_TURNO_GRADUACAO == 2 ~ "Vespertino",
+    CO_TURNO_GRADUACAO == 3 ~ "Integral",
+    CO_TURNO_GRADUACAO == 4 ~ "Noturno"
+    )
+)
+
+resumo_nas=microdados_musica %>%
+  select(everything()) %>%  
+  summarise_all(list(~sum(is.na(.))))
+
+#Removendo  Na´S De todas As variáveis que possuem NA
+microdados_musica_sem_NA=microdados_musica %>% na.omit()
+
+microdados_geral_sem_NA = microdados_enade_filtrados %>% na.omit()
+
+
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Total de alunos
+
+```{r}
+valueBox(nrow(microdados_musica), icon = "fa-pencil")
+```
+
+### Registros conflitantes
+
+```{r}
+valueBox(resumo_nas$NT_GER, 
+         icon = "fa-trash",
+         color = "warning")
+```
+
+### Alunos após limpeza
+
+```{r}
+valueBox(nrow(microdados_musica_sem_NA), icon = "fa-check", color = "success")
+```
+
+
+
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Total de alunos por Raça/Cor
+
+```{r}
+microdados_musica_raca = microdados_musica_sem_NA %>%
+  select(raca) %>%
+  group_by(raca) %>%
+  summarise(
+    quantidade = n()
+  )
+
+
+myPalette <- brewer.pal(6, "Set2") 
+
+pie(microdados_musica_raca$quantidade,labels=microdados_musica_raca$quantidade, border="white", col = myPalette)
+legend(.8,.8, microdados_musica_raca$raca, cex = 0.7, fill = myPalette)
+
+```
+
+### Total de alunos por Turno
+
+```{r}
+microdados_musica_turno = microdados_musica_sem_NA %>%
+  select(turno_graduacao) %>%
+  group_by(turno_graduacao) %>%
+  summarise(
+    quantidade = n()
+  )
+
+
+myPalette <- brewer.pal(6, "Set2") 
+
+pie(microdados_musica_turno$quantidade,labels=microdados_musica_turno$quantidade, border="white", col = myPalette)
+legend(1.1, .1, microdados_musica_turno$turno_graduacao, cex = 0.7, fill = myPalette)
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Histograma da nota dos alunos de Música (Licenciatura)
+
+```{r}
+g_hist = ggplot(microdados_musica_sem_NA, aes(x = NT_GER)) +
+  geom_histogram(color = "black",
+                 fill = "lightblue",
+                 bins = 20,
+                 aes(y = (..count..) / sum(..count..))) +
+  xlab("Nota Geral") +
+  ylab("Frequência relativa")
+
+ggplotly(g_hist)
+```
+
+### Histograma da nota dos alunos de todos os cursos
+
+```{r}
+g_hist = ggplot(microdados_geral_sem_NA, aes(x = NT_GER)) +
+  geom_histogram(color = "black",
+                 fill = "lightblue",
+                 bins = 20,
+                 aes(y = (..count..) / sum(..count..))) +
+  xlab("Nota Geral") +
+  ylab("Frequência relativa")
+
+ggplotly(g_hist)
+```
+
