@@ -232,7 +232,7 @@ g_hist = ggplot(microdados_musica_sem_NA, aes(x = NT_GER)) +
 
 ggplotly(g_hist)
 ```
-# Análise referentes a Turno e Raça/Cor
+# Análise referentes a Turno,  Raça/Cor e Renda Familiar
 
 ## Análise por Raça/Cor
 ```{r análise raca/cor - tabela }
@@ -348,5 +348,101 @@ ggplotly(grafico_boxplot3)
 
 ```
 
+## Análise por Idade e Sexo
 
+### Análise por Idade
+
+```{r analise por idade e sexo}
+#Descrevendo
+microdados_idade = microdados_musica_sem_NA %>%
+  select(NU_IDADE) %>%
+  summarise(
+    quantidade = n(),
+    minimo = quantile(NU_IDADE,0), 
+    Q1 = quantile(NU_IDADE,0.25),
+    media = mean(NU_IDADE),
+    mediana = median(NU_IDADE),
+    Q3 = quantile(NU_IDADE,0.75),
+    maximo = quantile(NU_IDADE,1),
+    cv = sd(NU_IDADE) / media * 100,
+    assimetria = skewness(NU_IDADE),
+    curtose = kurtosis(NU_IDADE)
+  ) %>%
+  arrange(desc(mediana))
+
+moda_idade = Mode(microdados_musica_sem_NA$NU_IDADE)
+
+microdados_idade = microdados_idade %>% mutate(
+  modas = case_when(
+    is.na(moda_idade)[1]  ~ "Amodal",
+    length(moda_idade) == 1 ~ as.character(moda_idade[1]),
+    length(moda_idade) == 2 ~ paste(moda_idade[1],moda_idade[2], sep = " e "),
+    TRUE ~ "Multimodal"
+  )
+)
+
+microdados_idade %>%
+  kbl %>%
+  kable_material_dark(full_width = F)
+
+
+
+```
+
+Quando visualizamos os dados sobre a distribuição de idade percebemos que existe uma diferença de mais de 50 anos entre o aluno mais novo (`r microdados_idade$minimo` anos) e o mais velho (`r microdados_idade$maximo` anos).
+
+Fica claro que pessoas mais velhas não costumam cursar música, visto que 75% dos alunos possuem até `r microdados_idade$Q3` anos e a mediana é `r microdados_idade$mediana` anos. A assimetria positiva `r microdados_idade$assimetria` indica que a curva tende a ser mais aberta no lado direito do eixo, onde as idades são mais altas.
+
+Já o coeficiente de curtose `r microdados_idade$curtose` indica uma curva Leptocúrtica, ou seja, com uma concentração maior e aparência mais pontiaguda.
+
+No histograma abaixo é possível notar que o pico das frequências é menor que 25 anos, e que a frequência vai diminuindo conforme a idade aumenta. Em verde temos o Q3 (`r microdados_idade$Q3` anos) e em vermelho a mediana (`r microdados_idade$mediana` anos).
+
+```{r graficos idade}
+g_hist_idade = ggplot(microdados_musica_sem_NA, aes(x = NU_IDADE)) +
+  geom_histogram(color = "black",
+                 fill = "lightblue",
+                 bins = 25,
+                 aes(y = (..count..) / sum(..count..))) +
+  ggtitle("Histograma da Idade dos alunos de Música (Licenciatura)") +
+  xlab("Idade") +
+  ylab("Frequência relativa") +
+  geom_vline(aes(xintercept = microdados_idade$mediana),col='red',size=1) +
+  geom_vline(aes(xintercept = microdados_idade$Q3),col='green',size=1)
+
+ggplotly(g_hist_idade)
+```
+
+### Análise por Idade e Sexo 
+
+```{r tabela sexo e idade}
+microdados_idade_sexo = microdados_musica_sem_NA %>%
+  select(NU_IDADE, sexo, TP_SEXO) %>%
+  group_by(sexo) %>%
+  summarise(
+    quantidade = n(),
+    media = mean(NU_IDADE, na.rm = T),
+    mediana = median(NU_IDADE, na.rm = T),
+    cv = sd(NU_IDADE, na.rm = T) / media * 100,
+    amplitude_interquartil = IQR(NU_IDADE)
+  ) %>%
+  arrange(mediana)
+
+microdados_idade_sexo %>%
+  kbl %>%
+  kable_material_dark(full_width = F)
+```
+
+Quando relacionamos a idade com o Sexo, percebemos que existem mais homens (`r microdados_idade_sexo$quantidade[2]`) do que mulheres (`r microdados_idade_sexo$quantidade[1]`), porém as mulheres são mais jovens que os homens. Entretanto a distribuição de idades entre os 2 gêneros são similares, assumindo a mesma assimetria positiva nos 2 casos.
+
+```{r grafico sexo e idade}
+grafico_histograma1 = ggplot(microdados_musica_sem_NA, aes(x=NU_IDADE,fill=sexo)) + 
+  geom_histogram(aes(y = (..count..) / sum(..count..))) +
+  ggtitle("Gráfico histograma da Idade por Sexo") +
+  xlab("Idades") +
+  ylab("Frequência Relativa") +
+  facet_grid(~sexo)
+
+ggplotly(grafico_histograma1)
+
+```
 
