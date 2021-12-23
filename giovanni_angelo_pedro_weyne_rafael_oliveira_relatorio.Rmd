@@ -133,7 +133,7 @@ paged_table(head(microdados_musica))
 E segue também a classificação das variáveis selecionadas
 
 ```{r classificacao}
-qualitativa_quantitativa = c("Qualitativa Nominal", "Qualitativa Nominal","Quantitativa Contínua","Qualitativa Nominal","Qualitativa Nominal","Quantitativa Discreta ???","Qualitativa Nominal","Qualitativa Nominal","Qualitativa Ordinal", "Qualitativa Ordinal","Quantitativa Discreta")
+qualitativa_quantitativa = c("Qualitativa Nominal", "Qualitativa Nominal","Quantitativa Contínua","Qualitativa Nominal","Qualitativa Nominal","Quantitativa Discreta","Qualitativa Nominal","Qualitativa Nominal","Qualitativa Ordinal", "Qualitativa Ordinal","Quantitativa Discreta")
 classifica_variaveis = data.frame("Variável" = names(microdados_enade_filtrados), "Classificação" = qualitativa_quantitativa)
 
 classifica_variaveis %>% kbl %>% kable_material_dark(full_width = T)
@@ -210,7 +210,7 @@ microdados_descricao %>%
   kable_material_dark(full_width = F)
 
 ```
-Pelas dados acima conseguimos perceber que de acordo com o valor alto do coeficiente de variação (`r microdados_descricao$cv`), a mediana é mais confiável do que a média, embora as duas estejam com valores muito próximos.
+Pelos dados acima conseguimos perceber que de acordo com o valor alto do coeficiente de variação (`r microdados_descricao$cv`), a mediana é mais confiável do que a média, embora as duas estejam com valores muito próximos.
 
 Além disso é possível ver que a maioria da turma não tirou notas muito boas, já que 75% tiraram até `r microdados_descricao$Q3` e a mediana ficou em `r microdados_descricao$mediana` não chegando nem a metade do valor do total da prova que é 100. Outro fato que corrabora com essa dedução é uma assimetria positiva `r microdados_descricao$assimetria` indicando que o a curva tende a ser maior no lado esquerdo do eixo, onde as notas são menores.
 
